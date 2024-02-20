@@ -1,0 +1,15 @@
+{
+  "prettier.arrowParens": "avoid",
+  "prettier.bracketSpacing": true,
+  "prettier.embeddedLanguageFormatting": "auto",
+  "prettier.bracketSameLine": true,
+  "prettier.endOfLine": "auto",
+  "prettier.htmlWhitespaceSensitivity": "css",
+  "prettier.jsxSingleQuote": false,
+  "prettier.insertPragma": false,
+  "prettier.printWidth": 90,
+  "prettier.quoteProps": "as-needed",
+  "prettier.requireConfig": false,
+  "prettier.resolveGlobalModules": false,
+  "prettier.requirePragma": false
+}
