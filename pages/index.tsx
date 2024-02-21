@@ -2,6 +2,7 @@ import * as React from "react";
 import { useState } from "react";
 import {
   FormControlLabel,
+  FormGroup,
   Checkbox,
   TextField,
   Box,
@@ -13,19 +14,60 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  SelectChangeEvent,
   Button,
+  IconButton,
 } from "@mui/material";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
+
 export default function Home() {
-  const [profile, setProfile] = useState([]);
-  const [Status, setAge] = React.useState("");
-  const handleChange = (event: SelectChangeEvent) => {
-    setAge(event.target.value as string);
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    gender: "male",
+    hobby: [],
+    status: "",
+    note: "",
+    ConfirmPDPA: "",
+  });
+
+  // สำหรับการอัพเดทข้อมูลภายใน type input
+  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setForm(prevState => {
+      return { ...prevState, [name]: value };
+    });
   };
+
+  // สำหรับการอัพเดทข้อมูลภายใน type checkbox
+  const [skills, setSkills] = useState<string[]>([]);
+  const handleFormChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const index = skills.indexOf(event.target.value);
+    if (index === -1) {
+      setSkills([...skills, event.target.value]);
+    } else {
+      setSkills(skills.filter(skill => skill !== event.target.value));
+    }
+  };
+
+  // สำหรับการอัพเดทข้อมูลภายใน type select
+  const handleSelectChange = (event: React.SelectChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setForm(prevState => {
+      return { ...prevState, [name]: value };
+    });
+  };
+
+  // สำหรับการรับข้อมูล
+  const handleOnSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    console.log(form);
+  };
+
   return (
     <>
       <Box
@@ -40,79 +82,251 @@ export default function Home() {
           User profile management System
         </Typography>
       </Box>
-      <Box sx={{ width: "40vw", ml: 3 }}>
-        <Typography variant="h4" sx={{ textAlign: "center", mb: 3 }}>
-          Profile management
-        </Typography>
+
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          gap: 6,
+        }}>
+        <Box sx={{ width: "40vw", ml: 3 }}>
+          <Typography variant="h4" sx={{ textAlign: "center", mb: 3 }}>
+            Profile management
+          </Typography>
+          <form onSubmit={handleOnSubmit}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+                borderRadius: 2,
+                boxShadow: 2,
+                p: 2,
+              }}>
+              <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+                <TextField
+                  sx={{ width: "50%" }}
+                  label="Name"
+                  variant="outlined"
+                  name="firstName"
+                  value={form.firstName}
+                  type="text"
+                  onChange={handleOnChange}
+                />
+                <TextField
+                  sx={{ width: "50%" }}
+                  label="Last name"
+                  variant="outlined"
+                  name="lastName"
+                  value={form.lastName}
+                  type="text"
+                  onChange={handleOnChange}
+                />
+              </Box>
+              <TextField
+                fullWidth
+                label="Email"
+                variant="outlined"
+                name="email"
+                value={form.email}
+                type="text"
+                onChange={handleOnChange}
+              />
+              <FormControlLabel
+                name="ConfirmPDPA"
+                value="Confirm"
+                control={<Checkbox />}
+                label="Confirm PDPA"
+                labelPlacement="end"
+                onChange={handleOnChange}
+              />
+              <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+                <FormControl>
+                  <FormLabel>Gender</FormLabel>
+                  <RadioGroup
+                    row
+                    defaultValue="male"
+                    aria-labelledby="demo-row-radio-buttons-group-label"
+                    name="gender"
+                    value={form.gender}
+                    onChange={handleOnChange}>
+                    <FormControlLabel value="male" control={<Radio />} label="Male" />
+                    <FormControlLabel value="female" control={<Radio />} label="Female" />
+                    <FormControlLabel value="Etc" control={<Radio />} label="Etc" />
+                  </RadioGroup>
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Hobby</FormLabel>
+                  <FormGroup aria-label="position" row>
+                    <FormControlLabel
+                      name="hobby"
+                      value={form.hobby}
+                      label="Game"
+                      control={
+                        <Checkbox
+                          checked={skills.includes("Game")}
+                          onChange={handleFormChange}
+                        />
+                      }
+                    />
+                    <FormControlLabel
+                      name="hobby"
+                      value={form.hobby}
+                      label="Music"
+                      control={
+                        <Checkbox
+                          checked={skills.includes("Music")}
+                          onChange={handleFormChange}
+                        />
+                      }
+                    />
+                    <FormControlLabel
+                      name="hobby"
+                      value={form.hobby}
+                      label="Craft"
+                      control={
+                        <Checkbox
+                          checked={skills.includes("Craft")}
+                          onChange={handleFormChange}
+                        />
+                      }
+                    />
+                    <FormControlLabel
+                      name="hobby"
+                      value={form.hobby}
+                      label="Reading"
+                      control={
+                        <Checkbox
+                          checked={skills.includes("Reading")}
+                          onChange={handleFormChange}
+                        />
+                      }
+                    />
+                  </FormGroup>
+                </FormControl>
+              </Box>
+              <FormControl fullWidth>
+                <InputLabel>Status</InputLabel>
+                <Select
+                  value={form.status}
+                  label="Status"
+                  name="status"
+                  onChange={handleSelectChange}>
+                  <MenuItem value={"Single"}>Single</MenuItem>
+                  <MenuItem value={"Married"}>Married</MenuItem>
+                  <MenuItem value={"Divorce"}>Divorce</MenuItem>
+                </Select>
+              </FormControl>
+              <TextField
+                fullWidth
+                label="Note"
+                variant="outlined"
+                value={form.note}
+                name="note"
+                onChange={handleOnChange}
+              />
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: 2,
+                  justifyContent: "flex-end",
+                  mt: 2,
+                }}>
+                <Button variant="contained">RESET</Button>
+                <Button variant="contained" type="submit">
+                  SUBMIT
+                </Button>
+              </Box>
+            </Box>
+          </form>
+        </Box>
+        {/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */}
+
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
-            gap: 2,
-            borderRadius: 2,
-            boxShadow: 2,
-            p: 2,
+            gap: 3,
           }}>
-          <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
-            <TextField sx={{ width: "50%" }} label="Name" variant="outlined" />
-            <TextField sx={{ width: "50%" }} label="Last name" variant="outlined" />
-          </Box>
-          <TextField fullWidth label="Email" variant="outlined" />
-          <FormControlLabel
-            value="end"
-            control={<Checkbox />}
-            label="Confirm PDPA"
-            labelPlacement="end"
-          />
-          <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
-            <FormControl>
-              <FormLabel>Gender</FormLabel>
-              <RadioGroup
-                row
-                defaultValue="male"
-                aria-labelledby="demo-row-radio-buttons-group-label"
-                name="row-radio-buttons-group">
-                <FormControlLabel value="male" control={<Radio />} label="Male" />
-                <FormControlLabel value="female" control={<Radio />} label="Female" />
-                <FormControlLabel value="other" control={<Radio />} label="Etc" />
-              </RadioGroup>
-            </FormControl>
-            <FormControl>
-              <FormLabel>Hobby</FormLabel>
-              <RadioGroup
-                row
-                aria-labelledby="demo-row-radio-buttons-group-label"
-                name="row-radio-buttons-group">
-                <FormControlLabel value="Game" control={<Checkbox />} label="Game" />
-                <FormControlLabel value="Music" control={<Checkbox />} label="Music" />
-                <FormControlLabel value="Craft" control={<Checkbox />} label="Craft" />
-                <FormControlLabel
-                  value="Reading"
-                  control={<Checkbox />}
-                  label="Reading"
-                />
-              </RadioGroup>
-            </FormControl>
-          </Box>
-          <FormControl fullWidth>
-            <InputLabel>Status</InputLabel>
-            <Select value={Status} label="Status" onChange={handleChange}>
-              <MenuItem value={"Single"}>Single</MenuItem>
-              <MenuItem value={"Married"}>Married</MenuItem>
-              <MenuItem value={"Divorce"}>Divorce</MenuItem>
-            </Select>
-          </FormControl>
-          <TextField fullWidth label="Note" variant="outlined" />
           <Box
             sx={{
               display: "flex",
-              flexDirection: "row",
-              gap: 2,
-              justifyContent: "flex-end",
-              mt: 2,
+              flexDirection: "column",
+              gap: 1,
+              borderRadius: 2,
+              boxShadow: 2,
+              p: 2,
+              width: "55vw",
+              height: "178px",
+              mr: 4,
             }}>
-            <Button variant="contained">RESET</Button>
-            <Button variant="contained">SUBMIT</Button>
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}>
+              <Typography variant="h6">USER 1</Typography>
+              <IconButton aria-label="delete">
+                <DeleteOutlineIcon />
+              </IconButton>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+              }}>
+              <Box
+                sx={{
+                  width: "50%",
+                }}>
+                <Typography>Name: {form.firstName + " " + form.lastName}</Typography>
+              </Box>
+              <Box
+                sx={{
+                  width: "50%",
+                }}>
+                <Typography>Email: {form.email}</Typography>
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+              }}>
+              <Box
+                sx={{
+                  width: "50%",
+                }}>
+                <Typography>Gender: {form.gender}</Typography>
+              </Box>
+              <Box
+                sx={{
+                  width: "50%",
+                }}>
+                <Typography>Hobby: {form.hobby}</Typography>
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+              }}>
+              <Box
+                sx={{
+                  width: "50%",
+                }}>
+                <Typography>Status: {form.status}</Typography>
+              </Box>
+              <Box
+                sx={{
+                  width: "50%",
+                }}>
+                <Typography>Note: {form.note}</Typography>
+              </Box>
+            </Box>
           </Box>
         </Box>
       </Box>
