@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import {
   FormControlLabel,
   FormGroup,
@@ -35,6 +36,19 @@ export default function Home() {
     ConfirmPDPA: "",
   });
 
+  // const { reset } = useForm;
+  // ({
+  //   firstName: "",
+  //   lastName: "",
+  //   email: "",
+  //   gender: "male",
+  //   hobby: [],
+  //   status: "",
+  //   note: "",
+  //   ConfirmPDPA: "",
+  // });
+
+  const [hobby, setHobby] = useState<string[]>([]);
   // สำหรับการอัพเดทข้อมูลภายใน type input
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -44,23 +58,15 @@ export default function Home() {
   };
 
   // สำหรับการอัพเดทข้อมูลภายใน type checkbox
-  const [skills, setSkills] = useState<string[]>([]);
   const handleFormChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const index = skills.indexOf(event.target.value);
+    const index = hobby.indexOf(event.target.value);
     if (index === -1) {
-      setSkills([...skills, event.target.value]);
+      setHobby([...hobby, event.target.value]);
     } else {
-      setSkills(skills.filter(skill => skill !== event.target.value));
+      setHobby(hobby.filter(skill => skill !== event.target.value));
     }
   };
-
-  // สำหรับการอัพเดทข้อมูลภายใน type select
-  const handleSelectChange = (event: React.SelectChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setForm(prevState => {
-      return { ...prevState, [name]: value };
-    });
-  };
+  console.log({ hobby });
 
   // สำหรับการรับข้อมูล
   const handleOnSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -160,44 +166,44 @@ export default function Home() {
                   <FormGroup aria-label="position" row>
                     <FormControlLabel
                       name="hobby"
-                      value={form.hobby}
+                      value="Game"
                       label="Game"
                       control={
                         <Checkbox
-                          checked={skills.includes("Game")}
+                          checked={hobby.includes("Game")}
                           onChange={handleFormChange}
                         />
                       }
                     />
                     <FormControlLabel
                       name="hobby"
-                      value={form.hobby}
+                      value="Music"
                       label="Music"
                       control={
                         <Checkbox
-                          checked={skills.includes("Music")}
+                          checked={hobby.includes("Music")}
                           onChange={handleFormChange}
                         />
                       }
                     />
                     <FormControlLabel
                       name="hobby"
-                      value={form.hobby}
+                      value="Craft"
                       label="Craft"
                       control={
                         <Checkbox
-                          checked={skills.includes("Craft")}
+                          checked={hobby.includes("Craft")}
                           onChange={handleFormChange}
                         />
                       }
                     />
                     <FormControlLabel
                       name="hobby"
-                      value={form.hobby}
+                      value="Reading"
                       label="Reading"
                       control={
                         <Checkbox
-                          checked={skills.includes("Reading")}
+                          checked={hobby.includes("Reading")}
                           onChange={handleFormChange}
                         />
                       }
@@ -211,7 +217,7 @@ export default function Home() {
                   value={form.status}
                   label="Status"
                   name="status"
-                  onChange={handleSelectChange}>
+                  onChange={handleOnChange}>
                   <MenuItem value={"Single"}>Single</MenuItem>
                   <MenuItem value={"Married"}>Married</MenuItem>
                   <MenuItem value={"Divorce"}>Divorce</MenuItem>
@@ -306,7 +312,7 @@ export default function Home() {
                 sx={{
                   width: "50%",
                 }}>
-                <Typography>Hobby: {form.hobby}</Typography>
+                <Typography>Hobby: {hobby}</Typography>
               </Box>
             </Box>
             <Box
@@ -327,6 +333,14 @@ export default function Home() {
                 <Typography>Note: {form.note}</Typography>
               </Box>
             </Box>
+            <FormControlLabel
+              name="ConfirmPDPA"
+              value="Confirm"
+              control={<Checkbox />}
+              label="Confirm PDPA"
+              labelPlacement="end"
+              onChange={handleOnChange}
+            />
           </Box>
         </Box>
       </Box>
