@@ -1,6 +1,5 @@
 import * as React from "react";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
 import {
   FormControlLabel,
   FormGroup,
@@ -24,8 +23,39 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
+// กำหนด type ให้ข้อมูล
+interface FormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  gender: string;
+  hobby: string[];
+  status: string;
+  note: string;
+  ConfirmPDPA: string;
+}
+
 export default function Home() {
-  const [form, setForm] = useState({
+  // ค่า เริ่มต้นของ hobby
+  const [hobby, setHobby] = useState<string[]>([]);
+  // --------------------------------------------------------------------------------------------------
+  // Func ปุ่มReset เป็นค่าเริ่มต้น
+  const handleReset = () => {
+    setForm({
+      firstName: "",
+      lastName: "",
+      email: "",
+      gender: "male",
+      hobby: [],
+      status: "",
+      note: "",
+      ConfirmPDPA: "",
+    });
+    setHobby([]);
+  };
+  // --------------------------------------------------------------------------------------------------
+  // ค่า เริ่มต้นของ form ทั่วไป
+  const [form, setForm] = useState<FormData>({
     firstName: "",
     lastName: "",
     email: "",
@@ -35,43 +65,45 @@ export default function Home() {
     note: "",
     ConfirmPDPA: "",
   });
-
-  // const { reset } = useForm;
-  // ({
-  //   firstName: "",
-  //   lastName: "",
-  //   email: "",
-  //   gender: "male",
-  //   hobby: [],
-  //   status: "",
-  //   note: "",
-  //   ConfirmPDPA: "",
-  // });
-
-  const [hobby, setHobby] = useState<string[]>([]);
-  // สำหรับการอัพเดทข้อมูลภายใน type input
+  // --------------------------------------------------------------------------------------------------
+  // Func สำหรับ Form ทั่วไป
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setForm(prevState => {
       return { ...prevState, [name]: value };
     });
   };
-
-  // สำหรับการอัพเดทข้อมูลภายใน type checkbox
+  // --------------------------------------------------------------------------------------------------
+  // Func สำหรับ Hobby
   const handleFormChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const index = hobby.indexOf(event.target.value);
-    if (index === -1) {
-      setHobby([...hobby, event.target.value]);
-    } else {
-      setHobby(hobby.filter(skill => skill !== event.target.value));
-    }
-  };
-  console.log({ hobby });
+    const value = event.target.value;
+    const updatedHobby = [...hobby];
 
-  // สำหรับการรับข้อมูล
+    if (!updatedHobby.includes(value)) {
+      updatedHobby.push(value);
+    } else {
+      updatedHobby.splice(updatedHobby.indexOf(value), 1);
+    }
+    setHobby(updatedHobby);
+    setForm(prevState => ({
+      ...prevState,
+      hobby: updatedHobby,
+    }));
+  };
+  // --------------------------------------------------------------------------------------------------
+  // Func ของปุ่ม Submit ที่มีไว้สำหรับดึงข้อมูลจากformเข้า submittedData แล้วก็เรียกใช้ Func Reset ค่าฟอร์มอีกรอบ
+  const [submittedForm, setSubmittedForm] = useState<FormData[]>([]);
   const handleOnSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(form);
+    setSubmittedForm([...submittedForm, form]);
+    handleReset();
+  };
+  // --------------------------------------------------------------------------------------------------
+  // Func สำหรับลบข้อมูลที่ถูกกด Submit ด้านข้าง
+  const handleDelete = (index: number) => {
+    const updatedForm = [...submittedForm];
+    updatedForm.splice(index, 1);
+    setSubmittedForm(updatedForm);
   };
 
   return (
@@ -138,13 +170,23 @@ export default function Home() {
                 type="text"
                 onChange={handleOnChange}
               />
+              {/* เขียน Func ของ PDPA แยก */}
               <FormControlLabel
                 name="ConfirmPDPA"
-                value="Confirm"
-                control={<Checkbox />}
+                control={
+                  <Checkbox
+                    checked={form.ConfirmPDPA === "Confirm"}
+                    onChange={event => {
+                      const { checked } = event.target;
+                      setForm(prevState => ({
+                        ...prevState,
+                        ConfirmPDPA: checked ? "Confirm" : "",
+                      }));
+                    }}
+                  />
+                }
                 label="Confirm PDPA"
                 labelPlacement="end"
-                onChange={handleOnChange}
               />
               <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
                 <FormControl>
@@ -239,7 +281,9 @@ export default function Home() {
                   justifyContent: "flex-end",
                   mt: 2,
                 }}>
-                <Button variant="contained">RESET</Button>
+                <Button variant="contained" onClick={handleReset}>
+                  RESET
+                </Button>
                 <Button variant="contained" type="submit">
                   SUBMIT
                 </Button>
@@ -248,100 +292,111 @@ export default function Home() {
           </form>
         </Box>
         {/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */}
-
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
             gap: 3,
           }}>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 1,
-              borderRadius: 2,
-              boxShadow: 2,
-              p: 2,
-              width: "55vw",
-              height: "178px",
-              mr: 4,
-            }}>
+          {submittedForm.map((data, index) => (
             <Box
-              sx={{
-                width: "100%",
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-              }}>
-              <Typography variant="h6">USER 1</Typography>
-              <IconButton aria-label="delete">
-                <DeleteOutlineIcon />
-              </IconButton>
-            </Box>
-            <Box
+              key={index}
               sx={{
                 display: "flex",
-                flexDirection: "row",
+                flexDirection: "column",
+                gap: 3,
               }}>
               <Box
                 sx={{
-                  width: "50%",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 1,
+                  borderRadius: 2,
+                  boxShadow: 2,
+                  p: 2,
+                  width: "53vw",
+                  height: "178px",
+                  mr: 4,
                 }}>
-                <Typography>Name: {form.firstName + " " + form.lastName}</Typography>
-              </Box>
-              <Box
-                sx={{
-                  width: "50%",
-                }}>
-                <Typography>Email: {form.email}</Typography>
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}>
+                  <Typography variant="h6"> USER {index + 1} </Typography>
+                  <IconButton aria-label="delete" onClick={() => handleDelete(index)}>
+                    <DeleteOutlineIcon />
+                  </IconButton>
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                  }}>
+                  <Box
+                    sx={{
+                      width: "50%",
+                    }}>
+                    <Typography>
+                      Name: {data.firstName} {data.lastName}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      width: "50%",
+                    }}>
+                    <Typography>Email: {data.email}</Typography>
+                  </Box>
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                  }}>
+                  <Box
+                    sx={{
+                      width: "50%",
+                    }}>
+                    <Typography>Gender: {data.gender}</Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      width: "50%",
+                    }}>
+                    <Typography>Hobby: {data.hobby.join(" , ")}</Typography>
+                  </Box>
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                  }}>
+                  <Box
+                    sx={{
+                      width: "50%",
+                    }}>
+                    <Typography>Status: {data.status}</Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      width: "50%",
+                    }}>
+                    <Typography>Note: {data.note}</Typography>
+                  </Box>
+                </Box>
+                <FormControlLabel
+                  disabled
+                  name="ConfirmPDPA"
+                  value="Confirm"
+                  control={<Checkbox checked={data.ConfirmPDPA === "Confirm"} />}
+                  label="Confirm PDPA"
+                  labelPlacement="end"
+                />
               </Box>
             </Box>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-              }}>
-              <Box
-                sx={{
-                  width: "50%",
-                }}>
-                <Typography>Gender: {form.gender}</Typography>
-              </Box>
-              <Box
-                sx={{
-                  width: "50%",
-                }}>
-                <Typography>Hobby: {hobby}</Typography>
-              </Box>
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-              }}>
-              <Box
-                sx={{
-                  width: "50%",
-                }}>
-                <Typography>Status: {form.status}</Typography>
-              </Box>
-              <Box
-                sx={{
-                  width: "50%",
-                }}>
-                <Typography>Note: {form.note}</Typography>
-              </Box>
-            </Box>
-            <FormControlLabel
-              name="ConfirmPDPA"
-              value="Confirm"
-              control={<Checkbox />}
-              label="Confirm PDPA"
-              labelPlacement="end"
-              onChange={handleOnChange}
-            />
-          </Box>
+          ))}
         </Box>
       </Box>
     </>
