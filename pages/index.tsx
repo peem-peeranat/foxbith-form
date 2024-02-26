@@ -22,7 +22,6 @@ import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
-
 // กำหนด type ให้ข้อมูล
 interface FormData {
   firstName: string;
@@ -32,9 +31,8 @@ interface FormData {
   hobby: string[];
   status: string;
   note: string;
-  ConfirmPDPA: string;
+  confirmPDPA: boolean;
 }
-
 export default function Home() {
   // ค่า เริ่มต้นของ hobby
   const [hobby, setHobby] = useState<string[]>([]);
@@ -46,10 +44,9 @@ export default function Home() {
       lastName: "",
       email: "",
       gender: "male",
-      hobby: [],
       status: "",
       note: "",
-      ConfirmPDPA: "",
+      confirmPDPA: false,
     });
     setHobby([]);
   };
@@ -63,7 +60,7 @@ export default function Home() {
     hobby: [],
     status: "",
     note: "",
-    ConfirmPDPA: "",
+    confirmPDPA: false,
   });
   // --------------------------------------------------------------------------------------------------
   // Func สำหรับ Form ทั่วไป
@@ -95,7 +92,7 @@ export default function Home() {
   const [submittedForm, setSubmittedForm] = useState<FormData[]>([]);
   const handleOnSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSubmittedForm([...submittedForm, form]);
+    setSubmittedForm(prevState => [...prevState, form]);
     handleReset();
   };
   // --------------------------------------------------------------------------------------------------
@@ -172,15 +169,15 @@ export default function Home() {
               />
               {/* เขียน Func ของ PDPA แยก */}
               <FormControlLabel
-                name="ConfirmPDPA"
+                name="confirmPDPA"
                 control={
                   <Checkbox
-                    checked={form.ConfirmPDPA === "Confirm"}
+                    checked={form.confirmPDPA}
                     onChange={event => {
                       const { checked } = event.target;
                       setForm(prevState => ({
                         ...prevState,
-                        ConfirmPDPA: checked ? "Confirm" : "",
+                        confirmPDPA: checked,
                       }));
                     }}
                   />
@@ -188,6 +185,7 @@ export default function Home() {
                 label="Confirm PDPA"
                 labelPlacement="end"
               />
+
               <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
                 <FormControl>
                   <FormLabel>Gender</FormLabel>
@@ -200,56 +198,26 @@ export default function Home() {
                     onChange={handleOnChange}>
                     <FormControlLabel value="male" control={<Radio />} label="Male" />
                     <FormControlLabel value="female" control={<Radio />} label="Female" />
-                    <FormControlLabel value="Etc" control={<Radio />} label="Etc" />
+                    <FormControlLabel value="etc" control={<Radio />} label="Etc" />
                   </RadioGroup>
                 </FormControl>
                 <FormControl>
                   <FormLabel>Hobby</FormLabel>
                   <FormGroup aria-label="position" row>
-                    <FormControlLabel
-                      name="hobby"
-                      value="Game"
-                      label="Game"
-                      control={
-                        <Checkbox
-                          checked={hobby.includes("Game")}
-                          onChange={handleFormChange}
-                        />
-                      }
-                    />
-                    <FormControlLabel
-                      name="hobby"
-                      value="Music"
-                      label="Music"
-                      control={
-                        <Checkbox
-                          checked={hobby.includes("Music")}
-                          onChange={handleFormChange}
-                        />
-                      }
-                    />
-                    <FormControlLabel
-                      name="hobby"
-                      value="Craft"
-                      label="Craft"
-                      control={
-                        <Checkbox
-                          checked={hobby.includes("Craft")}
-                          onChange={handleFormChange}
-                        />
-                      }
-                    />
-                    <FormControlLabel
-                      name="hobby"
-                      value="Reading"
-                      label="Reading"
-                      control={
-                        <Checkbox
-                          checked={hobby.includes("Reading")}
-                          onChange={handleFormChange}
-                        />
-                      }
-                    />
+                    {["Game", "Music", "Craft", "Reading"].map(hobbyItem => (
+                      <FormControlLabel
+                        key={hobbyItem}
+                        name="hobby"
+                        value={hobbyItem}
+                        label={hobbyItem}
+                        control={
+                          <Checkbox
+                            checked={hobby.includes(hobbyItem)}
+                            onChange={handleFormChange}
+                          />
+                        }
+                      />
+                    ))}
                   </FormGroup>
                 </FormControl>
               </Box>
@@ -260,9 +228,11 @@ export default function Home() {
                   label="Status"
                   name="status"
                   onChange={handleOnChange}>
-                  <MenuItem value={"Single"}>Single</MenuItem>
-                  <MenuItem value={"Married"}>Married</MenuItem>
-                  <MenuItem value={"Divorce"}>Divorce</MenuItem>
+                  {["Single", "Married", "Divorce"].map(status => (
+                    <MenuItem key={status} value={status}>
+                      {status}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
               <TextField
@@ -340,14 +310,16 @@ export default function Home() {
                       width: "50%",
                     }}>
                     <Typography>
-                      Name: {data.firstName} {data.lastName}
+                      {data.firstName || data.lastName
+                        ? `Name: ${data.firstName} ${data.lastName}`
+                        : `Name: -`}
                     </Typography>
                   </Box>
                   <Box
                     sx={{
                       width: "50%",
                     }}>
-                    <Typography>Email: {data.email}</Typography>
+                    <Typography>{`Email: ${data.email || "-"}`}</Typography>
                   </Box>
                 </Box>
                 <Box
@@ -365,7 +337,9 @@ export default function Home() {
                     sx={{
                       width: "50%",
                     }}>
-                    <Typography>Hobby: {data.hobby.join(" , ")}</Typography>
+                    <Typography>{`Hobby: ${
+                      data.hobby && data.hobby.length > 0 ? data.hobby.join(" , ") : "-"
+                    }`}</Typography>
                   </Box>
                 </Box>
                 <Box
@@ -377,20 +351,20 @@ export default function Home() {
                     sx={{
                       width: "50%",
                     }}>
-                    <Typography>Status: {data.status}</Typography>
+                    <Typography>{`Status: ${data.status || "-"}`}</Typography>
                   </Box>
                   <Box
                     sx={{
                       width: "50%",
                     }}>
-                    <Typography>Note: {data.note}</Typography>
+                    <Typography>{`Note: ${data.note || "-"}`}</Typography>
                   </Box>
                 </Box>
                 <FormControlLabel
                   disabled
                   name="ConfirmPDPA"
                   value="Confirm"
-                  control={<Checkbox checked={data.ConfirmPDPA === "Confirm"} />}
+                  control={<Checkbox checked={data.confirmPDPA} />}
                   label="Confirm PDPA"
                   labelPlacement="end"
                 />
