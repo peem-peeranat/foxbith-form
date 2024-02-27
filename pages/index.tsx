@@ -35,7 +35,7 @@ interface FormData {
 }
 export default function Home() {
   // ค่า เริ่มต้นของ hobby
-  const [hobby, setHobby] = useState<string[]>([]);
+  // const [hobby, setHobby] = useState<string[]>([]);
   // --------------------------------------------------------------------------------------------------
   // Func ปุ่มReset เป็นค่าเริ่มต้น
   const handleReset = () => {
@@ -47,8 +47,9 @@ export default function Home() {
       status: "",
       note: "",
       confirmPDPA: false,
+      hobby: [],
     });
-    setHobby([]);
+    // setHobby([]);
   };
   // --------------------------------------------------------------------------------------------------
   // ค่า เริ่มต้นของ form ทั่วไป
@@ -74,18 +75,17 @@ export default function Home() {
   // Func สำหรับ Hobby
   const handleFormChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    const updatedHobby = [...hobby];
-
-    if (!updatedHobby.includes(value)) {
-      updatedHobby.push(value);
+    if (!form.hobby.includes(value)) {
+      setForm(prevState => ({
+        ...prevState,
+        hobby: [...prevState.hobby, value],
+      }));
     } else {
-      updatedHobby.splice(updatedHobby.indexOf(value), 1);
+      setForm(prevState => ({
+        ...prevState,
+        hobby: prevState.hobby.filter(item => item !== value),
+      }));
     }
-    setHobby(updatedHobby);
-    setForm(prevState => ({
-      ...prevState,
-      hobby: updatedHobby,
-    }));
   };
   // --------------------------------------------------------------------------------------------------
   // Func ของปุ่ม Submit ที่มีไว้สำหรับดึงข้อมูลจากformเข้า submittedData แล้วก็เรียกใช้ Func Reset ค่าฟอร์มอีกรอบ
@@ -212,7 +212,7 @@ export default function Home() {
                         label={hobbyItem}
                         control={
                           <Checkbox
-                            checked={hobby.includes(hobbyItem)}
+                            checked={form.hobby.includes(hobbyItem)}
                             onChange={handleFormChange}
                           />
                         }
@@ -337,9 +337,8 @@ export default function Home() {
                     sx={{
                       width: "50%",
                     }}>
-                    <Typography>{`Hobby: ${
-                      data.hobby && data.hobby.length > 0 ? data.hobby.join(" , ") : "-"
-                    }`}</Typography>
+                    <Typography>{`Hobby: ${data.hobby && data.hobby.length > 0 ? data.hobby.join(" , ") : "-"
+                      }`}</Typography>
                   </Box>
                 </Box>
                 <Box
