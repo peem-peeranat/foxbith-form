@@ -29,7 +29,7 @@ interface FormData {
 }
 export default function Home() {
   // ค่า เริ่มต้นของ hobby
-  const [hobby, setHobby] = useState<string[]>([]);
+  // const [hobby, setHobby] = useState<string[]>([]);
   const hobbies = ["game", "music", "craft", "reading"];
   const status = ["single", "married", "divorce"];
   // --------------------------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ export default function Home() {
       confirmPDPA: false,
       hobby: [""],
     });
-    setHobby([]);
+    // setHobby([]);
   };
   // --------------------------------------------------------------------------------------------------
   // ค่า เริ่มต้นของ form ทั่วไป
@@ -71,17 +71,25 @@ export default function Home() {
   // Func สำหรับ Hobby
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    const updatedHobby = [...hobby];
-    if (!updatedHobby.includes(value)) {
-      updatedHobby.push(value);
+    // const updatedHobby = form;
+    if (!form.hobby.includes(value)) {
+      setForm(prevState => ({
+        ...prevState,
+        hobby: [...prevState.hobby, value],
+      }));
     } else {
-      updatedHobby.splice(updatedHobby.indexOf(value), 1);
+      // updatedHobby.splice(updatedHobby.indexOf(value), 1);
+      const deletedHobby = form.hobby.filter(h => h !== value);
+      setForm(prevState => ({
+        ...prevState,
+        hobby: deletedHobby,
+      }));
     }
-    setHobby(updatedHobby);
-    setForm(prevState => ({
-      ...prevState,
-      hobby: updatedHobby,
-    }));
+    // setHobby(updatedHobby);
+    // setForm(prevState => ({
+    //   ...prevState,
+    //   hobby: [...prevState.hobby, value],
+    // }));
   };
   // --------------------------------------------------------------------------------------------------
   // Func ของปุ่ม Submit ที่มีไว้สำหรับดึงข้อมูลจากformเข้า submittedData แล้วก็เรียกใช้ Func Reset ค่าฟอร์มอีกรอบ
@@ -208,7 +216,7 @@ export default function Home() {
                         label={hobbyItem}
                         control={
                           <Checkbox
-                            checked={hobby.includes(hobbyItem)}
+                            checked={form.hobby.includes(hobbyItem)}
                             onChange={handleChange}
                           />
                         }
@@ -335,7 +343,7 @@ export default function Home() {
                       width: "50%",
                     }}>
                     <Typography>{`Hobby: ${
-                      data.hobby.length > 0 ? data.hobby.join(" , ") : "-"
+                      data.hobby.length > 1 ? data.hobby.join(" , ") : "-"
                     }`}</Typography>
                   </Box>
                 </Box>
