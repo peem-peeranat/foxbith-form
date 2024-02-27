@@ -1,41 +1,37 @@
 import * as React from "react";
 import { useState } from "react";
-import {
-  FormControlLabel,
-  FormGroup,
-  Checkbox,
-  TextField,
-  Box,
-  Typography,
-  FormControl,
-  FormLabel,
-  RadioGroup,
-  Radio,
-  InputLabel,
-  MenuItem,
-  Select,
-  Button,
-  IconButton,
-} from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import "@fontsource/roboto/300.css";
-import "@fontsource/roboto/400.css";
-import "@fontsource/roboto/500.css";
-import "@fontsource/roboto/700.css";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormGroup from "@mui/material/FormGroup";
+import Checkbox from "@mui/material/Checkbox";
+import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import FormControl from "@mui/material/FormControl";
+import FormLabel from "@mui/material/FormLabel";
+import RadioGroup from "@mui/material/RadioGroup";
+import Radio from "@mui/material/Radio";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
 // กำหนด type ให้ข้อมูล
 interface FormData {
   firstName: string;
   lastName: string;
   email: string;
-  gender: string;
+  gender: string[];
   hobby: string[];
-  status: string;
+  status: string[];
   note: string;
   confirmPDPA: boolean;
 }
 export default function Home() {
   // ค่า เริ่มต้นของ hobby
   const [hobby, setHobby] = useState<string[]>([]);
+  const hobbies = ["game", "music", "craft", "reading"];
+  const status = ["single", "married", "divorce"];
   // --------------------------------------------------------------------------------------------------
   // Func ปุ่มReset เป็นค่าเริ่มต้น
   const handleReset = () => {
@@ -43,10 +39,11 @@ export default function Home() {
       firstName: "",
       lastName: "",
       email: "",
-      gender: "male",
-      status: "",
+      gender: ["male"],
+      status: [""],
       note: "",
       confirmPDPA: false,
+      hobby: [""],
     });
     setHobby([]);
   };
@@ -56,9 +53,9 @@ export default function Home() {
     firstName: "",
     lastName: "",
     email: "",
-    gender: "male",
-    hobby: [],
-    status: "",
+    gender: ["male"],
+    hobby: [""],
+    status: [""],
     note: "",
     confirmPDPA: false,
   });
@@ -72,10 +69,9 @@ export default function Home() {
   };
   // --------------------------------------------------------------------------------------------------
   // Func สำหรับ Hobby
-  const handleFormChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     const updatedHobby = [...hobby];
-
     if (!updatedHobby.includes(value)) {
       updatedHobby.push(value);
     } else {
@@ -204,7 +200,7 @@ export default function Home() {
                 <FormControl>
                   <FormLabel>Hobby</FormLabel>
                   <FormGroup aria-label="position" row>
-                    {["Game", "Music", "Craft", "Reading"].map(hobbyItem => (
+                    {hobbies.map(hobbyItem => (
                       <FormControlLabel
                         key={hobbyItem}
                         name="hobby"
@@ -213,7 +209,7 @@ export default function Home() {
                         control={
                           <Checkbox
                             checked={hobby.includes(hobbyItem)}
-                            onChange={handleFormChange}
+                            onChange={handleChange}
                           />
                         }
                       />
@@ -224,11 +220,12 @@ export default function Home() {
               <FormControl fullWidth>
                 <InputLabel>Status</InputLabel>
                 <Select
+                  labelId="demo-simple-select-label"
                   value={form.status}
                   label="Status"
                   name="status"
                   onChange={handleOnChange}>
-                  {["Single", "Married", "Divorce"].map(status => (
+                  {status.map(status => (
                     <MenuItem key={status} value={status}>
                       {status}
                     </MenuItem>
@@ -338,7 +335,7 @@ export default function Home() {
                       width: "50%",
                     }}>
                     <Typography>{`Hobby: ${
-                      data.hobby && data.hobby.length > 0 ? data.hobby.join(" , ") : "-"
+                      data.hobby.length > 0 ? data.hobby.join(" , ") : "-"
                     }`}</Typography>
                   </Box>
                 </Box>
